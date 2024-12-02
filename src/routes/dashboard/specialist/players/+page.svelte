@@ -164,6 +164,11 @@ const playersSnapshot = await getDocs(playersQuery);
 // Check if the player already exists in the array
 if (!playersSnapshot.empty) {
     toast.error('اللاعب مسجل بالفعل');
+    availablePlayers = availablePlayers.map(p =>
+      p.id === player.id ? {...p, isRegistered: true} : p
+    );
+    console.log("player:" + player.id);
+    console.log("player snapshot:" + playersSnapshot.docs[0].id);
     return;
 }
 
@@ -177,6 +182,12 @@ if (!playersSnapshot.empty) {
       players: [...(specialistData?.players || []), player.id]
     });
     players = [...players, player];
+    // change the isRegistered property to true in the Player array
+    availablePlayers = availablePlayers.map(p => 
+      p.id === player.id ? {...p, isRegistered: true} : p
+    );
+
+
     toast.success('تم تسجيل اللاعب بنجاح');
     isAddingPlayer = false;
 
@@ -185,6 +196,12 @@ if (!playersSnapshot.empty) {
   } finally {
     $isLoading = false;
   }
+
+  //change the isRegistered property to true in the Player collection
+  const playerRef = doc(db, 'Player', player.id);
+  await updateDoc(playerRef, {
+    isRegistered: true
+  })
 }
 
 // Function to remove a player
@@ -207,6 +224,17 @@ async function removePlayer(playerId) {
       players: updatedPlayers
    
     });
+
+    ///change the isRegistered property to false in the Player collection
+    const playerRef = doc(db, 'Player', playerId);
+    await updateDoc(playerRef, {
+      isRegistered: false
+    })
+
+    // change is registered property to false in the player array
+    availablePlayers = availablePlayers.map(p => 
+      p.id === playerId ? {...p, isRegistered: false} : p
+    );
 
     players = players.filter(player => player.id !== playerId);
 
@@ -447,15 +475,15 @@ $: {
           <div class="mt-6">
             <div class="mb-4">
               <div class="flex justify-between items-center mb-2">
-                <span class="font-medium text-gray-700">{Math.floor(player.levels.length / levels.length * 100) + '%'}</span>
+                <span class="font-medium text-gray-700">{player.levels? Math.floor(player.levels.length / levels.length * 100) + '%' : '0%'}</span>
                 <span class="text-sm text-gray-500">
-                  {player.levels.length}/{player.levels.length} نقطة
+                  {player.levels? player.levels.length : '0'}/{levels.length} نقطة
                 </span>
               </div>
               <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
                 <div 
                   class="h-full bg-primaryColor rounded-full transition-all"
-                  style="width: {player.levels.length / levels.length * 100}%"
+                  style="width: {player.levels? player.levels.length / levels.length * 100 : 0}%"
                 ></div>
               </div>
             </div>
@@ -483,18 +511,18 @@ $: {
               <div class="text-center p-3 bg-gray-50 rounded-lg">
                 <span class="block text-sm text-gray-500">التحديات المكتملة</span>
                 <span class="text-lg font-bold text-primaryColor">
-                  {player.levels.length}
+                  {player.levels? player.levels.length : '0'}
                 </span>
               </div>
               <div class="text-center p-3 bg-gray-50 rounded-lg">
                 <span class="block text-sm text-gray-500">مستوى التقدم</span>
                 <span class="text-lg font-bold text-primaryColor">
-                  {Math.floor(player.levels.length / levels.length * 100)}%
+                  {player.levels? Math.floor(player.levels.length / levels.length * 100) : '0'}%
                 </span>
               </div>
               <div class="text-center p-3 bg-gray-50 rounded-lg">
                 <span class="block text-sm text-gray-500">الحالة</span>
-                <span class="text-lg font-bold text-green-500">{player.levels ? 'مسجل' : 'غير مسجل'}</span>
+                <span class="text-lg font-bold {player.levels ? 'text-green-500' : 'text-red-500'}">{player.levels ? 'بدا اللعب' : 'غير مسجل'}</span>
               </div>
             </div>
           </div>

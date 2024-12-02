@@ -4,6 +4,7 @@
   import {user} from "$lib/stores/stores"
   import { db } from '$lib/firebase/config';
   import { collection, addDoc, getDocs, updateDoc,doc } from 'firebase/firestore';
+  import { toast } from 'svelte-french-toast';
 
   let userData =  $user
 
@@ -17,18 +18,26 @@
   function handleSubmit() {
     
     try {
+      
       user.set(userData)
-      const playerRef = doc(db, 'Player', userData.id);
-      updateDoc(playerRef, userData);
-      console.log('Document written with ID: ', userData.id);
+      const userDataToUpdate = {...userData}
+      // @ts-ignore
+      delete userDataToUpdate.avatar;
+
+      
+      const playerRef = doc(db, 'Player', userDataToUpdate.id);
+      updateDoc(playerRef, userDataToUpdate);
+      console.log('Document written with ID: ', userDataToUpdate.id);
+      toast.success('تم التحديث بنجاح')
     } catch (error) {
       console.error('Error adding document: ', error);
       console.log(userData)
-
+      toast.error('حدث خطأ')
 
     }
     isDirty = false;
   }
+
 
   function handleCancel() {
     
@@ -160,7 +169,7 @@
               type="tel"
               bind:value={userData.phone}
               on:input={handleInput}
-              class="w-full pl-4 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primaryColor/20 focus:border-primaryColor outline-none transition-colors"
+              class="w-full pl-4 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primaryColor/20 focus:border-primaryColor outline-none transition-colors text-right"
               required
               
             />

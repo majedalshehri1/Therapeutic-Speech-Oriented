@@ -40,10 +40,10 @@
   firstName: '',
   lastName: '',
   avatar: '',
-  type: '', 
-  username: '', 
-  email: '',   
-  phone: '',   
+  type: '',
+  username: '',
+  email: '',
+  phone: '',
   id: ''
     });
     isLoggedIn.set(false);

@@ -99,6 +99,7 @@ try {
     createdAt: new Date(),
     lastLogin: null,
     isActive: true,
+    isRegistered: isPlayerForm? false : null
   };
 
   // Add user to Firestore
