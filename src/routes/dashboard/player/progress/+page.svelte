@@ -11,43 +11,44 @@
     id: 0,
     name: 'تحديد المستوى',
     stage: 'تحديد المستوى',
-    totalPoints: 100  
+    totalPoints: 0  
   },
   {
     id: 1,
     name: 'المستوى الأول',
-    stage: 'مرحلة الصحراء',
-    totalPoints: 200  
+    stage: 'مرحلة الغابة',
+    totalPoints: 50  
   },
   {
     id: 2,
     name: 'المستوى الأول',
-    stage: 'مرحلة النار',
-    totalPoints: 200  
+    stage: 'مرحلة الصحراء',
+    totalPoints: 50
   },
   {
     id: 3,
     name: 'المستوى الثاني',
-    stage: 'مرحلة الثلج',
-    totalPoints: 400 
+    stage: 'مرحلة القصر',
+    totalPoints: 100 
   },
   {
     id:4,
     name: 'المستوى الثالث',
     stage: 'مرحلة الكهف',
-    totalPoints: 800  
+    totalPoints: 200  
   }
 ];
 
 let currentLevel;
 let playerData = null;
-let levels = [];
+let levelsCompleted = [];
 
 function transformFirestoreData(data) {
   const levelGroups = {};
   
   staticLevels.forEach((level, index) => {
-    const isStageCompleted = data.levels[index] === true;
+    const isStageCompleted = data.levelsCompleted[index] === true;
+    
     
     const accuracyPercentage = data.percentagePerLevel[index] || "0";
     
@@ -103,13 +104,15 @@ async function fetchPlayerData(playerId) {
   try {
     const playerRef = doc(db, 'Player', playerId);
     const playerSnap = await getDoc(playerRef);
-    
+    console.log(playerRef.firestore)
     if (playerSnap.exists()) {
       playerData = playerSnap.data();
-      levels = transformFirestoreData(playerData);
+      levelsCompleted = transformFirestoreData(playerData);
+      console.log(levelsCompleted)
       const currentLevelIndex = playerData.level || 0;
-      currentLevel = levels[currentLevelIndex];
-      console.log("Current Level:", currentLevel);
+      console.log(currentLevelIndex)
+      currentLevel = levelsCompleted[currentLevelIndex];
+      
     }
   } catch (error) {
     console.error('Error fetching player data:', error);
@@ -123,21 +126,23 @@ async function updateStageStatus(stageIndex, completed) {
   try {
     const playerRef = doc(db, 'Player', $user.id);
     const updates = {
-      [`levels.${stageIndex}`]: completed
+      [`levelsCompleted.${stageIndex}`]: completed
     };
-
+    
     await updateDoc(playerRef, updates);
     
     playerData = {
       ...playerData,
-      levels: {
-        ...playerData.levels,
+      levelsCompleted: {
+        ...playerData.levelsCompleted,
         [stageIndex]: completed
       }
     };
+
+
     
-    levels = transformFirestoreData(playerData);
-    currentLevel = levels.find(level => 
+    levelsCompleted = transformFirestoreData(playerData);;
+    currentLevel = levelsCompleted.find(level => 
       level.challenges.some(challenge => challenge.index === stageIndex)
     );
   } catch (error) {
@@ -153,8 +158,9 @@ onMount(async () => {
 
 function handleLevelChange(level) {
   if (level.status !== 'locked') {
-    currentLevel = level;
+    currentLevel = level  ;
   }
+  console.log(currentLevel)
 }
 
 
@@ -209,7 +215,7 @@ function handleLevelChange(level) {
 
         <!-- Levels List -->
         <div class="mt-8 space-y-3">
-          {#each levels as level}
+          {#each levelsCompleted as level}
             <button 
               class="w-full p-3 rounded-lg text-right transition-all 
                      {level.id === currentLevel?.id ? 'bg-primaryColor/10 text-primaryColor' : 'hover:bg-gray-50'}"
