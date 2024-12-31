@@ -174,8 +174,6 @@
       availablePlayers = availablePlayers.map(p => 
         p.id === player.id ? {...p, isRegistered: true} : p
       );
-  
-  
       toast.success('تم تسجيل اللاعب بنجاح');
       isAddingPlayer = false;
   
@@ -324,111 +322,130 @@
   </script>
   
   <!-- Main container with RTL layout -->
-  <div class="flex flex-row-reverse">
-    <!-- Sidebar for search and add functionality -->
-    <div class="w-80 min-h-[calc(100vh-4rem)] bg-gradient-to-b from-secondaryColor to-white border-l border-gray-100 p-4">
-      <div class="space-y-4">
-        <!-- Search input field -->
-        <div class="relative">
-          <input 
-            type="search" 
-            bind:value={searchQuery}
-            placeholder="بحث عن لاعب..."
-            class="w-full pr-10 pl-4 py-3 bg-white border border-gray-100 rounded-lg 
-                   focus:outline-none focus:ring-2 focus:ring-primaryColor/20 
-                   focus:border-primaryColor transition-all"
-          />
-          <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-            <SearchIcon size="18" />
-          </span>
-        </div>
-  
-        <!-- Add player button -->
-        <button 
-          class="w-full py-3 px-4 bg-primaryColor text-white rounded-lg
-                 hover:bg-cyan-600 transition-all flex items-center justify-center gap-2"
-          on:click={toggleAddPlayer}
+<div class="flex flex-row-reverse">
+  <!-- Sidebar for search and add functionality -->
+  <div class="w-80 min-h-[calc(100vh-4rem)] bg-gradient-to-b from-secondaryColor to-white border-l border-gray-100 p-4">
+    <div class="space-y-4">
+      <!-- Search input field -->
+      <div class="relative">
+        <input 
+          type="search" 
+          bind:value={searchQuery}
+          placeholder="بحث عن لاعب..."
+          class="w-full pr-10 pl-4 py-3 bg-white border border-gray-100 rounded-lg 
+                 focus:outline-none focus:ring-2 focus:ring-primaryColor/20 
+                 focus:border-primaryColor transition-all"
+        />
+        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+          <SearchIcon size="18" />
+        </span>
+      </div>
+
+      <!-- Add player button -->
+      <button 
+        class="w-full py-3 px-4 bg-primaryColor text-white rounded-lg
+               hover:bg-cyan-600 transition-all flex items-center justify-center gap-2"
+        on:click={toggleAddPlayer}
+      >
+        <UserPlusIcon size="18" />
+        <span>إضافة لاعب</span>
+      </button>
+
+      <!-- Add Player Modal -->
+      {#if isAddingPlayer}
+        <div 
+          class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center"
+          transition:fade
         >
-          <UserPlusIcon size="18" />
-          <span>إضافة لاعب</span>
-        </button>
-  
-        <!-- Add Player Modal -->
-        {#if isAddingPlayer}
           <div 
-            class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center"
-            transition:fade
+            class="bg-white rounded-xl p-6 w-[480px] shadow-xl"
+            transition:slide
           >
-            <div 
-              class="bg-white rounded-xl p-6 w-[480px] shadow-xl"
-              transition:slide
-            >
-              <h3 class="text-xl font-bold mb-4">إضافة لاعب جديد</h3>
-              
-              <!-- Modal search input -->
-              <input 
-                type="search"
-                bind:value={searchAvailableQuery}
-                placeholder="ابحث عن لاعب لإضافته..."
-                class="w-full px-4 py-2 border border-gray-200 rounded-lg mb-4"
-              />
-  
-              <!-- Available players list -->
-              <div class="max-h-[300px] overflow-y-auto space-y-2">
-                {#each filteredAvailablePlayers as player}
-                  <div class="w-full p-3 flex items-center justify-between gap-3 rounded-lg hover:bg-gray-50">
-                    <div class="flex items-center gap-3">
-                      <img 
-                        src={player.avatar} 
-                        alt={player.firstName}
-                        class="w-10 h-10 rounded-full"
-                      />
-                      <div class="text-right">
-                        <div class="font-medium">{player.firstName}</div>
-                        <div class="text-sm text-gray-500">{player.username}</div>
-                      </div>
+            <h3 class="text-xl font-bold mb-4">إضافة لاعب جديد</h3>
+            
+            <!-- Modal search input -->
+            <input 
+              type="search"
+              bind:value={searchAvailableQuery}
+              placeholder="ابحث عن لاعب لإضافته..."
+              class="w-full px-4 py-2 border border-gray-200 rounded-lg mb-4"
+            />
+
+            <!-- Available players list -->
+            <div class="max-h-[300px] overflow-y-auto space-y-2">
+              {#each filteredAvailablePlayers as player}
+                <div class="w-full p-3 flex items-center justify-between gap-3 rounded-lg hover:bg-gray-50">
+                  <div class="flex items-center gap-3">
+                    <img 
+                      src={player.avatar} 
+                      alt={player.firstName}
+                      class="w-10 h-10 rounded-full"
+                    />
+                    <div class="text-right">
+                      <div class="font-medium">{player.firstName}</div>
+                      <div class="text-sm text-gray-500">{player.username}</div>
                     </div>
-                    
-                    {#if player.isRegistered}
-                      <span class="text-sm px-3 py-1 bg-gray-100 text-gray-600 rounded-full">
-                        مسجل مسبقاً
-                      </span>
-                    {:else}
-                      <button 
-                        class="text-sm px-3 py-1 bg-primaryColor text-white rounded-full hover:bg-cyan-600"
-                        on:click={() => addPlayer(player)}
-                      >
-                        تسجيل
-                      </button>
-                    {/if}
                   </div>
-                {/each}
-              </div>
-  
-              <!-- Modal close button -->
-              <button 
-                class="mt-4 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50"
-                on:click={() => isAddingPlayer = false}
-              >
-                إغلاق
-              </button>
+                  
+                  {#if player.isRegistered}
+                    <span class="text-sm px-3 py-1 bg-gray-100 text-gray-600 rounded-full">
+                      مسجل مسبقاً
+                    </span>
+                  {:else}
+                    <button 
+                      class="text-sm px-3 py-1 bg-primaryColor text-white rounded-full hover:bg-cyan-600"
+                      on:click={() => addPlayer(player)}
+                    >
+                      تسجيل
+                    </button>
+                  {/if}
+                </div>
+              {/each}
             </div>
+
+            <!-- Modal close button -->
+            <button 
+              class="mt-4 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50"
+              on:click={() => isAddingPlayer = false}
+            >
+              إغلاق
+            </button>
           </div>
-        {/if}
-      </div>
+        </div>
+      {/if}
     </div>
-  
-    <!-- Main content area -->
-    <div class="flex-1 p-6">
-      <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-800">اللاعبين</h1>
-        <p class="text-gray-500 text-sm mt-1">إدارة اللاعبين ومتابعة تقدمهم</p>
+  </div>
+
+  <!-- Main content area -->
+  <div class="flex-1 p-6">
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold text-gray-800">اللاعبين</h1>
+      <p class="text-gray-500 text-sm mt-1">إدارة اللاعبين ومتابعة تقدمهم</p>
+    </div>
+
+    <!-- Conditional rendering based on loading and players state -->
+    {#if $isLoading}
+      <div class="min-h-[60vh] flex items-center justify-center">
+        <div class="text-center">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primaryColor mx-auto"></div>
+          <p class="mt-4 text-gray-600">جاري التحميل...</p>
+        </div>
       </div>
-  
-      <!-- Players grid display -->
+    {:else if filteredPlayers.length === 0}
+      <div class="min-h-[60vh] flex items-center justify-center">
+        <div class="text-center">
+          <div class="w-16 h-16 bg-gray-100 rounded-full mb-4 mx-auto flex items-center justify-center">
+            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 mb-1">لا يوجد لاعبين مضافين</h3>
+          <p class="text-gray-500">قم بإضافة لاعبين من خلال زر "إضافة لاعب"</p>
+        </div>
+      </div>
+    {:else}
       <div class="grid gap-4">
         {#each filteredPlayers as player}
-          <!-- Individual player card -->
           <div class="bg-white rounded-xl border border-gray-100 p-6 hover:shadow-md">
             <!-- Player header with actions -->
             <div class="flex items-center justify-between">
@@ -446,9 +463,8 @@
                   <p class="text-sm text-gray-500">{player.username}</p>
                 </div>
               </div>
-  
+
               <div class="flex items-center gap-3">
-                
                 <button 
                   class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
                   title="حذف"
@@ -458,10 +474,9 @@
                 </button>
               </div>
             </div>
-  
+
             <!-- Level progress section -->
             <div class="mt-6">             
-              <!-- Update the stages progress section -->
               <div class="grid grid-cols-2 gap-4 mb-4">
                 {#each levels as level, index}
                   <div class="p-3 bg-gray-50 rounded-lg">
@@ -483,7 +498,7 @@
                   </div>
                 {/each}
               </div>
-  
+
               <!-- Stats display -->
               <div class="grid grid-cols-3 gap-4">
                 <div class="text-center p-3 bg-gray-50 rounded-lg">
@@ -507,7 +522,7 @@
                 </div>
               </div>
             </div>
-  
+
             <!-- Contact information -->
             <div dir="ltr" class="mt-4 flex items-center gap-4 text-sm text-gray-500">
               <div class="flex items-center gap-1">
@@ -522,25 +537,25 @@
           </div>
         {/each}
       </div>
-    </div>
+    {/if}
   </div>
+</div>
   
-  <!-- Responsive styles -->
-  <style>
-    @media (max-width: 1024px) {
-      .flex {
-        flex-direction: column;
-      }
-      
-      .w-80 {
-        width: 100%;
-        min-height: auto;
-        border-left: none;
-        border-bottom: 1px solid #e5e7eb;
-      }
-  
-      .grid {
-        grid-template-columns: 1fr;
-      }
+<style>
+  @media (max-width: 1024px) {
+    .flex {
+      flex-direction: column;
     }
-  </style>
+    
+    .w-80 {
+      width: 100%;
+      min-height: auto;
+      border-left: none;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
